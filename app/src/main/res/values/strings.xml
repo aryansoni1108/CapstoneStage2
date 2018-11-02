@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">fitnessapp-test</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="volley_error">Network Error! Please Try Again!</string>
+    <string name="clicked_cat_id">cat_ID</string>
+    <string name="workouts_clicked_parcel">workout_clicked_id</string>
+    <string name="no_description_string">No Description Available</string>
+    <string name="login_success">login Success</string>
+    <string name="login_failed">Login Failded</string>
+    <string name="no_connectivity">No Connectivity</string>
+    <string name="login_unknown_Error">Login Unknown</string>
+</resources>
