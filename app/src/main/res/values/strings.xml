@@ -11,4 +11,8 @@
     <string name="login_failed">Login Failded</string>
     <string name="no_connectivity">No Connectivity</string>
     <string name="login_unknown_Error">Login Unknown</string>
+    <string name="creating_db_instance">Creating new database Instance</string>
+    <string name="getting_db_tag">Getting the database instance</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
 </resources>

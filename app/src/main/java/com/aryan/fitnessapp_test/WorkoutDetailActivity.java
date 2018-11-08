@@ -1,8 +1,6 @@
 package com.aryan.fitnessapp_test;
 
 import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModel;
-import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Build;
@@ -12,6 +10,7 @@ import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -22,6 +21,10 @@ import android.widget.ToggleButton;
 import com.aryan.fitnessapp_test.Networking.WorkoutInfoFetch;
 import com.aryan.fitnessapp_test.Networking.onFetchImageCompleted;
 import com.aryan.fitnessapp_test.ViewModels.MainViewModel;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -29,22 +32,26 @@ import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 public class WorkoutDetailActivity extends AppCompatActivity {
     Workouts workouts;
+
     @BindView(R.id.workout_description)TextView workout_description;
     @BindView(R.id.place_image)ImageView imageView;
     @BindView(R.id.titleview)TextView titleView;
     @BindView(R.id.start_stop)ToggleButton button;
     @BindView(R.id.save_fab)FloatingActionButton save_fab;
     CountDownTimer countDownTimer;
-    long time = 12000;
+    long time = 600000;
     Boolean isCounterRunning = false;
     Boolean isitthere = true;
     WorkoutDatabase mDb;
     Context context=WorkoutDetailActivity.this;
+    DatabaseReference databaseReference;
     @BindView(R.id.stop_button)Button StopButton;
+    WorkoutProgress workoutProgress;
+    public static final String FIREBASE_CHILD_WORKOUTS = "workoutprogress";
+
 
 
 
@@ -54,25 +61,59 @@ public class WorkoutDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_workout_detail);
         ButterKnife.bind(this);
         mDb=WorkoutDatabase.getsInstance(this);
+
+
+        databaseReference= FirebaseDatabase.getInstance().getReference(FIREBASE_CHILD_WORKOUTS);
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(FIREBASE_CHILD_WORKOUTS).child(user.getUid());
+
         workouts = getIntent().getParcelableExtra(getResources().getString(R.string.workouts_clicked_parcel));
         if(!Objects.equals(workouts.getDescription(), "")) {
-            workout_description.setText(workouts.getDescription());
+            workout_description.setText(Html.fromHtml(workouts.getDescription()).toString());
         }
         else{
             workout_description.setText(R.string.no_description_string);
         }
+        MainViewModel wprogress = ViewModelProviders.of(this).get(MainViewModel.class);
+        wprogress.getWorkout_progress().observe(this, new Observer<List<WorkoutProgress>>() {
+            @Override
+            public void onChanged(@Nullable List<WorkoutProgress> workoutProgresses) {
+                for (int i=0;i<workoutProgresses.size();i++){
+                    Log.e("wo"+workoutProgresses.get(i).getId(),""+workoutProgresses.get(i).getDurationinmin());
+                }
+            }
+        });
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(button.isChecked()) {
                     reverseTimer(time, button);
                     isCounterRunning=true;
+
                 }
                 else {
                     countDownTimer.cancel();
                     button.setText(""+formatTime(time));
                     isCounterRunning=false;
+                    workoutProgress = new WorkoutProgress();
+                    workoutProgress.setId(workouts.getId());
+                    workoutProgress.setTimestamp(System.currentTimeMillis() / 1000L);
+                    workoutProgress.setWorkoutName(workouts.getName_original());
+                    workoutProgress.setDurationinmin(time);
+                    String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                    databaseReference.child(userId).child(String.valueOf(workoutProgress.getTimestamp())).setValue(workoutProgress);
+
+
+                    //String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+
+                    WorkoutInfoFetch.SaveWorkoutProgress(mDb,context,workoutProgress);
+                    Log.e("tag",""+mDb.workoutDAO().getSumDuration(workoutProgress.getId()));
+
+
+
                 }
+
             }
         });
         StopButton.setOnClickListener(new View.OnClickListener() {
@@ -80,8 +121,7 @@ public class WorkoutDetailActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if(isCounterRunning){
                     countDownTimer.cancel();
-                    time=12000;
-
+                    time=600000;
                     button.setText("START");
                     button.setChecked(false);
                 }
@@ -89,6 +129,7 @@ public class WorkoutDetailActivity extends AppCompatActivity {
         });
 
         titleView.setText(workouts.getName_original());
+
 
         int id = workouts.getId();
         final String imageURL = "https://wger.de/api/v2/exerciseimage/"+id+"/thumbnails/";
@@ -118,6 +159,7 @@ public class WorkoutDetailActivity extends AppCompatActivity {
                         public void onClick(View v) {
                             save_fab.setImageResource(R.drawable.ic_favorite_black_24dp);
                             WorkoutInfoFetch.FavWorkout(mDb,context,workouts);
+
                         }
                     });
                 }
@@ -138,6 +180,12 @@ public class WorkoutDetailActivity extends AppCompatActivity {
         });
 
     }
+
+    private void syncwhennointernet() {
+
+    }
+
+
     public void reverseTimer(long miliSeconds,final Button tv){
 
         countDownTimer=new CountDownTimer(miliSeconds, 1000) {
@@ -155,12 +203,29 @@ public class WorkoutDetailActivity extends AppCompatActivity {
                 tv.setBackgroundColor(getColor(R.color.colorPrimaryDark));
 
 
+
             }
 
             @RequiresApi(api = Build.VERSION_CODES.M)
             public void onFinish() {
                 tv.setText("Completed");
                 tv.setBackgroundColor(getColor(R.color.colorAccent));
+                workoutProgress = new WorkoutProgress();
+                workoutProgress.setDurationinmin((time/60)/1000);
+                countDownTimer.cancel();
+                button.setText(""+formatTime(time));
+                isCounterRunning=false;
+                workoutProgress = new WorkoutProgress();
+                workoutProgress.setId(workouts.getId());
+                workoutProgress.setTimestamp(System.currentTimeMillis() / 1000L);
+                workoutProgress.setWorkoutName(workouts.getName_original());
+                workoutProgress.setDurationinmin(time);
+                //String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                syncwhennointernet();
+                WorkoutInfoFetch.SaveWorkoutProgress(mDb,context,workoutProgress);
+                Log.e("tag",""+mDb.workoutDAO().getSumDuration(workoutProgress.getId()));
+
+
             }
         }.start();
     }
@@ -172,6 +237,7 @@ public class WorkoutDetailActivity extends AppCompatActivity {
                 + ":" + String.format("%02d", seconds);
         return formattedTime;
     }
+
 
 
 

@@ -22,5 +22,16 @@ public interface WorkoutDAO {
     void deleteTask(Workouts workouts);
     @Query("SELECT * FROM Workouts WHERE id=:id")
     LiveData<Workouts> loadTaskById(int id);
+    @Query("SELECT * FROM workoutprogress ORDER BY id")
+    LiveData<List<WorkoutProgress>> loadAllWorkoutProgress();
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertWorkoutProgress(WorkoutProgress workoutprogress);
+    @Delete
+    void deleteWorkoutProgress(WorkoutProgress workoutprogress);
+    @Query("SELECT * FROM workoutprogress WHERE id=:id")
+    LiveData<WorkoutProgress> loadWorkoutProgressId(int id);
+   @Query("SELECT SUM(durationinmin) FROM workoutprogress WHERE id=:id")
+   Float getSumDuration(int id);
+
 
 }

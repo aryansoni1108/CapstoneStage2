@@ -6,11 +6,14 @@ import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
 import android.util.Log;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
+
 /**
  * Created by Aryan Soni on 10/27/2018.
  */
 
-@Database(entities = {Workouts.class},version = 1,exportSchema = false)
+@Database(entities = {Workouts.class,WorkoutProgress.class},version = 2,exportSchema = false)
 public abstract class WorkoutDatabase extends RoomDatabase{
     private static final String LOG_TAG=WorkoutDatabase.class.getSimpleName();
     private  static final Object LOCK = new Object();
@@ -19,15 +22,16 @@ public abstract class WorkoutDatabase extends RoomDatabase{
     public static WorkoutDatabase getsInstance(Context context){
         if(sInstance==null){
             synchronized (LOCK){
-                Log.d(LOG_TAG, "Creating new database Instance");
+                Log.d(LOG_TAG, context.getString(R.string.creating_db_instance));
                 sInstance = Room.databaseBuilder(context.getApplicationContext(),
                         WorkoutDatabase.class
-                        ,WorkoutDatabase.DATABASE_NAME).build();
+                        ,WorkoutDatabase.DATABASE_NAME).allowMainThreadQueries()//Only for getting sum of the column rest all are done on background thread
+                        .build();
 
 
             }
         }
-        Log.d(LOG_TAG, "Getting the database instance");
+        Log.d(LOG_TAG, context.getString(R.string.getting_db_tag));
         return sInstance;
 
     }

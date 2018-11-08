@@ -3,6 +3,7 @@ package com.aryan.fitnessapp_test.Fragments;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -52,39 +53,47 @@ public class BrowseFragment extends Fragment {
         final List<Category> categories=new ArrayList<>();
 
 
-        Bitmap abs = BitmapFactory.decodeResource(getActivity().getResources(),
-                R.drawable.man_abs);
-
-        Bitmap arms = BitmapFactory.decodeResource(getActivity().getResources(),
-                R.drawable.biceps_image);
-        Bitmap back = BitmapFactory.decodeResource(getActivity().getResources(),
-                R.drawable.man_back_image);
-        Bitmap calves = BitmapFactory.decodeResource(getActivity().getResources(),
-                R.drawable.calves_image);
-        Bitmap chest = BitmapFactory.decodeResource(getActivity().getResources(),
-                R.drawable.chest_image);
-        Bitmap legs = BitmapFactory.decodeResource(getActivity().getResources(),
-                R.drawable.legs_image);
-        Bitmap shoulders = BitmapFactory.decodeResource(getActivity().getResources(),
-                R.drawable.shoulder_image);
 
 
-        Category category1 = new Category(10,"Abs",abs);
-        Category category2 = new Category(8,"Arms",arms);
-        Category category3 = new Category(12,"back",back);
-        Category category4 = new Category(14,"calves",calves);
-        Category category5 = new Category(11,"chest",chest);
-        Category category6 = new Category(9,"legs",legs);
-        Category category7 = new Category(13,"Shoulders",shoulders);
+                Bitmap abs = BitmapFactory.decodeResource(getActivity().getResources(),
+                        R.drawable.man_abs);
+
+                Bitmap arms = BitmapFactory.decodeResource(getActivity().getResources(),
+                        R.drawable.biceps_image);
+                Bitmap back = BitmapFactory.decodeResource(getActivity().getResources(),
+                        R.drawable.man_back_image);
+                Bitmap calves = BitmapFactory.decodeResource(getActivity().getResources(),
+                        R.drawable.calves_image);
+                Bitmap chest = BitmapFactory.decodeResource(getActivity().getResources(),
+                        R.drawable.chest_image);
+                Bitmap legs = BitmapFactory.decodeResource(getActivity().getResources(),
+                        R.drawable.legs_image);
+                Bitmap shoulders = BitmapFactory.decodeResource(getActivity().getResources(),
+                        R.drawable.shoulder_image);
+                Category category1 = new Category(10,"Abs",abs);
+                Category category2 = new Category(8,"Arms",arms);
+                Category category3 = new Category(12,"back",back);
+                Category category4 = new Category(14,"calves",calves);
+                Category category5 = new Category(11,"chest",chest);
+                Category category6 = new Category(9,"legs",legs);
+                Category category7 = new Category(13,"Shoulders",shoulders);
 
 
-        categories.add(category1);
-        categories.add(category2);
-        categories.add(category3);
-        categories.add(category4);
-        categories.add(category5);
-        categories.add(category6);
-        categories.add(category7);
+                categories.add(category1);
+                categories.add(category2);
+                categories.add(category3);
+                categories.add(category4);
+                categories.add(category5);
+                categories.add(category6);
+                categories.add(category7);
+
+
+
+
+
+
+
+
 
 
 

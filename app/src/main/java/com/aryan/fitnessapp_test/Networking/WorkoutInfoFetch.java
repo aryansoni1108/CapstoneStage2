@@ -12,6 +12,7 @@ import com.aryan.fitnessapp_test.Adapters.CategoryRecyclerView;
 import com.aryan.fitnessapp_test.AppExecutor;
 import com.aryan.fitnessapp_test.R;
 import com.aryan.fitnessapp_test.WorkoutDatabase;
+import com.aryan.fitnessapp_test.WorkoutProgress;
 import com.aryan.fitnessapp_test.Workouts;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -20,6 +21,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.List;
 
@@ -96,4 +99,27 @@ public class WorkoutInfoFetch {
             }
         });
     }
+    public static void SaveWorkoutProgress(final WorkoutDatabase mDb,Context ctx,final WorkoutProgress workoutProgress){
+        AppExecutor.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                mDb.workoutDAO().insertWorkoutProgress(workoutProgress);
+            }
+        });
+    }
+    public static boolean isConnected() throws InterruptedException, IOException {
+        final String command = "ping -c 1 google.com";
+        return Runtime.getRuntime().exec(command).waitFor() == 0;
+    }
+//    public static Float getOverallDuration(final WorkoutDatabase mDb, Context ctx, final WorkoutProgress workoutProgress, final int id){
+//        final Float duration;
+//        AppExecutor.getInstance().diskIO().execute(new Runnable() {
+//            @Override
+//            public void run() {
+//                duration =mDb.workoutDAO().getSumDuration(id);
+//            }
+//        });
+//        return duration;
+//    }
+
 }

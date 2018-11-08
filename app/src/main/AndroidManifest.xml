@@ -3,6 +3,7 @@
     package="com.aryan.fitnessapp_test">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -19,7 +20,18 @@
             </intent-filter>
         </activity>
         <activity android:name=".WorkoutsListActivity" />
-        <activity android:name=".WorkoutDetailActivity"></activity>
+        <activity android:name=".WorkoutDetailActivity" />
+        <service android:name=".WorkoutIntentService"></service>
+
+        <receiver android:name=".NewAppWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/new_app_widget_info" />
+        </receiver>
     </application>
 
 </manifest>
